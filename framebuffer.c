@@ -221,30 +221,41 @@ static void fb_draw_string(uint32_t x, uint32_t y, const char* s, struct color* 
 		if (off < 0 || off >= NUM_CHARS)
 			continue;
 		
-		for (i = 0; i < FONT_HEIGHT; i++)
+		if (bkg)
 		{
-			for (j = 0; j < FONT_WIDTH; j++)
+			for (i = 0; i < FONT_HEIGHT; i++)
 			{
-				/* Get the pixel in font */
-				p = font_data[(i * NUM_CHARS * FONT_WIDTH) + (off * FONT_WIDTH) + j];
-				
-				/* Get the pixel in the frame */
-				pixel = sizeof(struct color) * ((y + i) * SCREEN_WIDTH + (x + j));
-				
-				if (bkg)
+				for (j = 0; j < FONT_WIDTH; j++)
 				{
+					/* Get the pixel in font */
+					p = font_data[(i * NUM_CHARS * FONT_WIDTH) + (off * FONT_WIDTH) + j];
+					
+					/* Get the pixel in the frame */
+					pixel = sizeof(struct color) * ((y + i) * SCREEN_WIDTH + (x + j));
+					
 					builder[pixel  ] = (uint8_t)(((b->R * (255 - p)) + (c->R * p)) / 255);
 					builder[pixel+1] = (uint8_t)(((b->G * (255 - p)) + (c->G * p)) / 255);
 					builder[pixel+2] = (uint8_t)(((b->B * (255 - p)) + (c->B * p)) / 255);
 				}
-				else
+			}
+		}
+		else if (off)
+		{
+			for (i = 0; i < FONT_HEIGHT; i++)
+			{
+				for (j = 0; j < FONT_WIDTH; j++)
 				{
+					/* Get the pixel in font */
+					p = font_data[(i * NUM_CHARS * FONT_WIDTH) + (off * FONT_WIDTH) + j];
+					
+					/* Get the pixel in the frame */
+					pixel = sizeof(struct color) * ((y + i) * SCREEN_WIDTH + (x + j));
+					
 					builder[pixel  ] = (uint8_t)(((builder[pixel  ] * (255 - p)) + (c->R * p)) / 255);
 					builder[pixel+1] = (uint8_t)(((builder[pixel+1] * (255 - p)) + (c->G * p)) / 255);
 					builder[pixel+2] = (uint8_t)(((builder[pixel+2] * (255 - p)) + (c->B * p)) / 255);
 				}
-				
-			}
+			}	
 		}
 		
 		x += FONT_WIDTH;
