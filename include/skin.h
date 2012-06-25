@@ -26,6 +26,7 @@
 
 #define FONT_HEIGHT            18
 #define FONT_WIDTH             10
+#define FONT_OUTLINE_WIDTH      1
 
 #define FIRST_CHAR             32
 #define NUM_CHARS              96
