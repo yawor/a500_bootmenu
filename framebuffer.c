@@ -145,8 +145,8 @@ static void fb_error(const char* msg)
 static void fb_draw_string(uint32_t x, uint32_t y, const char* s, struct color* b, struct color* c)
 {
 	char off;
-	int cc, bkg;
-	uint32_t i, j, pixel;
+	int cc, bkg, outline_x, outline_y;
+	uint32_t i, j, pixel, outline_pixel;
 	uint16_t p;
 	struct color* changing;
 	
@@ -221,29 +221,61 @@ static void fb_draw_string(uint32_t x, uint32_t y, const char* s, struct color* 
 		if (off < 0 || off >= NUM_CHARS)
 			continue;
 		
-		for (i = 0; i < FONT_HEIGHT; i++)
-		{
-			for (j = 0; j < FONT_WIDTH; j++)
+		if (bkg || off) {
+			for (i = 0; i < FONT_HEIGHT; i++)
 			{
-				/* Get the pixel in font */
-				p = font_data[(i * NUM_CHARS * FONT_WIDTH) + (off * FONT_WIDTH) + j];
-				
-				/* Get the pixel in the frame */
-				pixel = sizeof(struct color) * ((y + i) * SCREEN_WIDTH + (x + j));
-				
-				if (bkg)
+				for (j = 0; j < FONT_WIDTH; j++)
 				{
-					builder[pixel  ] = (uint8_t)(((b->R * (255 - p)) + (c->R * p)) / 255);
-					builder[pixel+1] = (uint8_t)(((b->G * (255 - p)) + (c->G * p)) / 255);
-					builder[pixel+2] = (uint8_t)(((b->B * (255 - p)) + (c->B * p)) / 255);
+					/* Get the pixel in font */
+					p = font_data[(i * NUM_CHARS * FONT_WIDTH) + (off * FONT_WIDTH) + j];
+					
+					/* Get the pixel in the frame */
+					pixel = sizeof(struct color) * ((y + i) * SCREEN_WIDTH + (x + j));
+					
+					if (bkg)
+					{
+						builder[pixel  ] = (uint8_t)(((b->R * (255 - p)) + (c->R * p)) / 255);
+						builder[pixel+1] = (uint8_t)(((b->G * (255 - p)) + (c->G * p)) / 255);
+						builder[pixel+2] = (uint8_t)(((b->B * (255 - p)) + (c->B * p)) / 255);
+					}
+					else
+					{
+						/* Render outline pixels */
+						// TODO: Add checking if outline_pixel is not out of bounds
+						// TODO2: Add font outline color setting
+						for (outline_x = -1; outline_x < 2; outline_x++) {
+							for (outline_y = -1; outline_y < 2; outline_y++) {
+								if (outline_x != 0 && outline_y != 0) {  // Changing && to || in condition will make outline quality better at the expense of performance
+									outline_pixel = pixel + outline_x * sizeof(struct color) + outline_y * SCREEN_WIDTH * sizeof(struct color);
+									builder[outline_pixel  ] = (uint8_t)(((builder[outline_pixel  ] * (255 - p))) / 255);
+									builder[outline_pixel+1] = (uint8_t)(((builder[outline_pixel+1] * (255 - p))) / 255);
+									builder[outline_pixel+2] = (uint8_t)(((builder[outline_pixel+2] * (255 - p))) / 255);
+								}
+							}
+						}
+					}
 				}
-				else
+			}
+		}
+
+		/* Render pixels of the text */
+		if (!bkg && off)  // Only if without background and not a space
+		{
+			for (i = 0; i < FONT_HEIGHT; i++)
+			{
+				for (j = 0; j < FONT_WIDTH; j++)
 				{
+					/* Get the pixel in font */
+					p = font_data[(i * NUM_CHARS * FONT_WIDTH) + (off * FONT_WIDTH) + j];
+					
+					/* Get the pixel in the frame */
+					pixel = sizeof(struct color) * ((y + i) * SCREEN_WIDTH + (x + j));
+					
+
 					builder[pixel  ] = (uint8_t)(((builder[pixel  ] * (255 - p)) + (c->R * p)) / 255);
 					builder[pixel+1] = (uint8_t)(((builder[pixel+1] * (255 - p)) + (c->G * p)) / 255);
 					builder[pixel+2] = (uint8_t)(((builder[pixel+2] * (255 - p)) + (c->B * p)) / 255);
 				}
-				
 			}
 		}
 		
