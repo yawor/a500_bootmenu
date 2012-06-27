@@ -261,8 +261,9 @@ static void fb_draw_string(uint32_t x, uint32_t y, const char* s, struct color* 
 				for (j = 0; j < OUTLINED_FONT_WIDTH; j++)
 				{
 					/* Get the pixel in font */
-					p = font_data[(i * NUM_CHARS * OUTLINED_FONT_WIDTH) + (off * OUTLINED_FONT_WIDTH) + j];
-					o = font_outline_data[(i * NUM_CHARS * OUTLINED_FONT_WIDTH) + (off * OUTLINED_FONT_WIDTH) + j];
+					pixel = (i * NUM_CHARS * OUTLINED_FONT_WIDTH) + (off * OUTLINED_FONT_WIDTH) + j;
+					p = font_data[pixel];
+					o = font_outline_data[pixel];
 					
 					/* Get the pixel in the frame */
 					pixel = sizeof(struct color) * ((y + i) * SCREEN_WIDTH + (x + j));
