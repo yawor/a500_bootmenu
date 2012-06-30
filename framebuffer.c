@@ -329,13 +329,16 @@ void fb_init()
 						gray = (char)((299*jpg_out_data[pixel] + 587*jpg_out_data[pixel+1] + 114*jpg_out_data[pixel+2]) / 1000);
 						pixel = ((i + FONT_OUTLINE_WIDTH) * NUM_CHARS * OUTLINED_FONT_WIDTH) + (off * OUTLINED_FONT_WIDTH) + j + FONT_OUTLINE_WIDTH;
 						font_data[pixel] = gray;
-						for (outline_i = i; outline_i <= i + FONT_OUTLINE_WIDTH * 2; outline_i++)
+						if (FONT_OUTLINE_WIDTH)
 						{
-							for (outline_j = j; outline_j <= j + FONT_OUTLINE_WIDTH * 2; outline_j++)
+							for (outline_i = i; outline_i <= i + FONT_OUTLINE_WIDTH * 2; outline_i++)
 							{
-								pixel = (outline_i * NUM_CHARS * OUTLINED_FONT_WIDTH) + (off * OUTLINED_FONT_WIDTH) + outline_j;
-								if (gray > font_outline_data[pixel])
-									font_outline_data[pixel] = gray;
+								for (outline_j = j; outline_j <= j + FONT_OUTLINE_WIDTH * 2; outline_j++)
+								{
+									pixel = (outline_i * NUM_CHARS * OUTLINED_FONT_WIDTH) + (off * OUTLINED_FONT_WIDTH) + outline_j;
+									if (gray > font_outline_data[pixel])
+										font_outline_data[pixel] = gray;
+								}
 							}
 						}
 					}
@@ -343,10 +346,14 @@ void fb_init()
 			}
 
 			/* Normalize outline data */
-
-			for (i = 0; i < font_size; i++) {
-				if (font_data[i] + font_outline_data[i] > 255) {
-					font_outline_data[i] = 255 - font_data[i];
+			if (FONT_OUTLINE_WIDTH)
+			{
+				for (i = 0; i < font_size; i++)
+				{
+					if (font_data[i] + font_outline_data[i] > 255)
+					{
+						font_outline_data[i] = 255 - font_data[i];
+					}
 				}
 			}
 		}
