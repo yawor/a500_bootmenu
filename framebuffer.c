@@ -38,7 +38,7 @@
 #define TITLE_Y_OFFSET      (OUTLINED_FONT_HEIGHT)
 
 #define TEXT_Y_OFFSET       (4*OUTLINED_FONT_HEIGHT)
-#define TEXT_X_OFFSET       ((SCREEN_WIDTH/2) - (OUTLINED_FONT_WIDTH*(TEXT_LINE_CHARS/2)))
+#define TEXT_X_OFFSET       ((SCREEN_WIDTH/2)-((OUTLINED_FONT_WIDTH+FONT_KERNING)*(TEXT_LINE_CHARS/2)))
 
 #include <skin.h>
 
@@ -275,7 +275,7 @@ static void fb_draw_string(uint32_t x, uint32_t y, const char* s, struct color* 
 			}	
 		}
 		
-		x += OUTLINED_FONT_WIDTH;
+		x += OUTLINED_FONT_WIDTH+FONT_KERNING;
 	}
 }
 
@@ -662,7 +662,7 @@ void fb_refresh()
 	b.B = 0;
 	
 	l = strlen(title);
-	fb_draw_string((SCREEN_WIDTH/2) - (l*OUTLINED_FONT_WIDTH/2), TITLE_Y_OFFSET, title, &b, &c);
+	fb_draw_string((SCREEN_WIDTH/2) - (l*(OUTLINED_FONT_WIDTH+FONT_KERNING)/2), TITLE_Y_OFFSET, title, &b, &c);
 	
 	c = title_color;
 	b.R = 0;
@@ -670,7 +670,7 @@ void fb_refresh()
 	b.B = 0;
 	
 	l = strlen(status);
-	fb_draw_string((SCREEN_WIDTH/2) - (l*OUTLINED_FONT_WIDTH/2), TITLE_Y_OFFSET + OUTLINED_FONT_HEIGHT, status, &b, &c);
+	fb_draw_string((SCREEN_WIDTH/2) - (l*(OUTLINED_FONT_WIDTH+FONT_KERNING)/2), TITLE_Y_OFFSET + OUTLINED_FONT_HEIGHT, status, &b, &c);
 	
 	/* Draw text */
 	c = text_color;
