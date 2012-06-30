@@ -312,7 +312,8 @@ void fb_init()
 			
 			/* Clear font and outline data */
 
-			for (i = 0; i < font_size; i++) {
+			for (i = 0; i < font_size; i++)
+			{
 				font_data[i] = 0;
 				font_outline_data[i] = 0;
 			}
